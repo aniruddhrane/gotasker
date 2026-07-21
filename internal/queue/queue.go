@@ -4,9 +4,9 @@ type Queue struct{
 	jobs chan job.Job
 }
 
-func New(size int)*Queue{
+func NewQueue(size int)*Queue{
   q:= Queue{
-	jobs:make(chan job.Job,size)
+	jobs:make(chan job.Job,size),
   }
   return &q
 }

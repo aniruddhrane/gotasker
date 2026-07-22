@@ -1,24 +1,30 @@
 package main
-import(
- "time"
- "github.com/aniruddhrane/gotasker/internal/queue"
-  "github.com/aniruddhrane/gotasker/internal/worker"
-  "github.com/aniruddhrane/gotasker/internal/job"
 
- )
+import (
+	"sync"
+
+	"github.com/aniruddhrane/gotasker/internal/job"
+	"github.com/aniruddhrane/gotasker/internal/queue"
+	"github.com/aniruddhrane/gotasker/internal/worker"
+)
  func main(){
+  var wg sync.WaitGroup
+
    q :=queue.NewQueue(10)
    w1 :=worker.Worker{
 	 ID:1,
 	 Queue: q,
+   Wg:&wg,
    }
    w2 :=worker.Worker{
 	 ID:2,
 	 Queue:q,
+   Wg:&wg,
    }
    w3 :=worker.Worker{
 	 ID:3,
 	 Queue: q,
+   Wg:&wg,
    }
 
    j1:=job.Job{
@@ -32,12 +38,15 @@ import(
 	Payload:"check the health of the system",
    }
    
-
+   wg.Add(1)
    go w1.Start()
+   wg.Add(1)
    go w2.Start()
+   wg.Add(1)
    go w3.Start()
+
    q.Enqueue(j1)
    q.Enqueue(j2)
-   time.Sleep(5 * time.Second)
-   
+   q.Close()
+   wg.Wait()   
  }

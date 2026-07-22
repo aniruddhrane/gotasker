@@ -1,16 +1,25 @@
 package worker
-import "github.com/aniruddhrane/gotasker/internal/queue"
-import "fmt"
+
+import (
+	"fmt"
+	"sync"
+
+	"github.com/aniruddhrane/gotasker/internal/queue"
+)
 type Worker struct{
 	ID int
 	Queue *queue.Queue
+	Wg *sync.WaitGroup
 }
 // worker's behavior with a Start() method that runs forever, 
 // dequeues jobs, and processes them
+//#update we removed dequeue() because the range can search for available job
+//and also process it through receving channel
 
 func (w*Worker) Start(){
-	for{
-       job := w.Queue.Dequeue()
+	defer w.Wg.Done()
+	for job:=range w.Queue.Jobs(){
        fmt.Printf("Worker %d processing job %d \n",w.ID,job.ID)
 	}
 }
+
